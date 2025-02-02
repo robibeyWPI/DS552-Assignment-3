@@ -1,6 +1,6 @@
 # Assignment 3 writeup
 
-### 1. Theory Questions:
+## 1. Theory Questions:
 - **Why is the KL Divergence term important in the VAE loss function?**
 The KL Divergence term is important in the VAE loss function because it minimizes the difference between the learned distribution of the data and a normal distribution, ensuring a smooth, continuous latent space that allows proper data generation from any point in the latent space.
 - **How does the reparameterization trick enable backpropagation through the stochastic layers of a VAE?**
@@ -10,8 +10,8 @@ A VAE uses a probabilistic latent space instead of a fixed latent space because 
 - **What role does KL Divergence play in ensuring a smooth latent space?**
 The KL Divergence is part of the loss function, which the model aims to minimize. The KL Divergence is part of the regularization which tries to ensure that the model does not wander too far from a known prior distribution. While the data does not have to be normally distributed, using a Gaussian distribution is typical, but not necessary, for the latent space. The decoder can map the normal distribution in the latent space to any other distribution outside of the latent space (the data input) smoothly because of the help of the regularization from the KL Divergence loss function.
 
-### 2. Coding Tasks:
-#### **Task 1:**
+## 2. Coding Tasks:
+### **Task 1:**
 I started by importing the CIFAR-10 dataset:
 ```python
 transform_train = transforms.Compose(
@@ -58,10 +58,11 @@ to the encoder and
 h2 = h2.view(h2.size(0), 1600, 4, 4) # in reverse (batch_size(32) * 1600 * 4 * 4) -> (batch_size, 1600, 4, 4)
 ```
 to the decoder. The loss function had specified dimensions which I had to remove as the CIFAR10 dataset has different dimensionality than the MNIST dataset. The models and data were sent to the GPU to improve model training times. I then compared the MNIST images that the fully connected VAE produced to the CIFAR10 images that the convolutional model produced:
+
 <img src="./images/fcvae.png"><img src="./images/cvae.png">
 I found that even though the convolutional VAE is more optimized for handling image data, that the FC VAE running on the much simpler MNIST dataset had an easier time of reproducing images that are more distinguishable to my eyes. Of course, most of this is due to the contrast between the pixels in the MNIST dataset, and some of the time is it difficult to identify what numeral is being outputted by the model. The convolutional VAE always produced blurry images, but I expected this as the CIFAR10 dataset is very pixelated, it is just very difficult to produce color images of complex shapes on this small of a resolution, especially given the 32x32 input dimensions of the dataset. I do believe I can identify some of the outputs in the sequence above, however.
 
-#### **Task 2:**
+### **Task 2:**
 For this task I started off by defining a function that will take the VAE, 2 images, and the number of steps to smoothly transition betwee. I set the VAE to eval mode and calculated $\mu$, $\sigma$, and the reparameterization parameters. This gives us everything we need to decode an image from the encoded data, which we do here:
 ```python
 # decode a combination between the two images
@@ -80,7 +81,7 @@ I chose 2 random images, plotted them, then calculated their interpolations, and
 <img src="./images/interp_outputs.png">
 While blurry, it is easy to distinguish that the left side resembles the shape and color of the original image while the right side resembles the original img 2, with all the other images being interpolated along the gradient. This demonstrates that a VAE can generate vast combinations of data.
 
-#### **Task 3:**
+### **Task 3:**
 The dataset of faces really piqued my interest so I pursued a similar dataset to the one mentioned in the assignment. I stumbled upon the [Flickr Faces HQ Dataset](https://github.com/NVlabs/ffhq-dataset) by NVlabs. It is a dataset of 70,000 1024x1024 PNG images that contains a large array of different human faces. The full dataset is 89 GB and I would resize it anyway so I opted to download the 128x128 thumbnail version of the dataset which is a more manageable 1.95 GB. Because there are no classes, it is just images in a folder, I opted to create my own dataset class instead of trying to work around the PyTorch DataFolder class. As stated in the [PyTorch docs](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html#creating-a-custom-dataset-for-your-files), a custom dataset needs to implement the init, len, and getitem functions so I did that in a similar way to the tutorial. Because the dataset contains larger images I opted to add one more convolutional layer. Other than that, the model is the same as the convolutional VAE written in Task 1.
 For no particular reason, I decided to use PIL Image instead of torchvision read_image, which was used in the PyTorch tutorial. I also defined a train and test split out of habit which is not necessary here, so the actual size of the training dataset is 56,000 images. Due to the long training time I opted to call the 56,000 images sufficient. **Assignment_3_fixes.ipynb** corrects this issue.
 <img src="./images/ffhq_train_images.png">
