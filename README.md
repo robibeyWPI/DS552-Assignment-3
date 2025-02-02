@@ -1,14 +1,14 @@
 # Assignment 3 writeup
 
 ## 1. Theory Questions:
-- **Why is the KL Divergence term important in the VAE loss function?**
-The KL Divergence term is important in the VAE loss function because it minimizes the difference between the learned distribution of the data and a normal distribution, ensuring a smooth, continuous latent space that allows proper data generation from any point in the latent space.
-- **How does the reparameterization trick enable backpropagation through the stochastic layers of a VAE?**
-The reparameterization trick enables backpropagation through the stochastic layers of a VAE by transforming the random sampling into a differentiable function by the function $z=\mu+\sigma\epsilon$ where $z \sim N(\mu, \sigma^2)$ and where $\epsilon \sim N(0,1)$. Basically, this reformulation allows the model to learn the parameters of the latent Gaussian distribution $(\mu,\sigma)$ while maintaining differentiability, ensuring gradients can be computed with respect to $\mu$ and $\sigma$ rather than the random sample itself.
-- **Why does a VAE use a probabilistic latent space instead of a fixed latent space?**
-A VAE uses a probabilistic latent space instead of a fixed latent space because using a probabilistic latent space allows for generation of similar, yet different, data from the same input parameters, as the generation draws from a distribution by sampling different points across the distribution range. A Gaussian distribution is typically used because it is easily reparameterized, as mentioned above, and it is smooth and continuous while being easy to compute and sample from.
-- **What role does KL Divergence play in ensuring a smooth latent space?**
-The KL Divergence is part of the loss function, which the model aims to minimize. The KL Divergence is part of the regularization which tries to ensure that the model does not wander too far from a known prior distribution. While the data does not have to be normally distributed, using a Gaussian distribution is typical, but not necessary, for the latent space. The decoder can map the normal distribution in the latent space to any other distribution outside of the latent space (the data input) smoothly because of the help of the regularization from the KL Divergence loss function.
+- **Why is the KL Divergence term important in the VAE loss function?**\
+    The KL Divergence term is important in the VAE loss function because it minimizes the difference between the learned distribution of the data and a normal distribution, ensuring a smooth, continuous latent space that allows proper data generation from any point in the latent space.
+- **How does the reparameterization trick enable backpropagation through the stochastic layers of a VAE?**\
+    The reparameterization trick enables backpropagation through the stochastic layers of a VAE by transforming the random sampling into a differentiable function by the function $z=\mu+\sigma\epsilon$ where $z \sim N(\mu, \sigma^2)$ and where $\epsilon \sim N(0,1)$. Basically, this reformulation allows the model to learn the parameters of the latent Gaussian distribution $(\mu,\sigma)$ while maintaining differentiability, ensuring gradients can be computed with respect to $\mu$ and $\sigma$ rather than the random sample itself.
+- **Why does a VAE use a probabilistic latent space instead of a fixed latent space?**\
+    A VAE uses a probabilistic latent space instead of a fixed latent space because using a probabilistic latent space allows for generation of similar, yet different, data from the same input parameters, as the generation draws from a distribution by sampling different points across the distribution range. A Gaussian distribution is typically used because it is easily reparameterized, as mentioned above, and it is smooth and continuous while being easy to compute and sample from.
+- **What role does KL Divergence play in ensuring a smooth latent space?**\
+    The KL Divergence is part of the loss function, which the model aims to minimize. The KL Divergence is part of the regularization which tries to ensure that the model does not wander too far from a known prior distribution. While the data does not have to be normally distributed, using a Gaussian distribution is typical, but not necessary, for the latent space. The decoder can map the normal distribution in the latent space to any other distribution outside of the latent space (the data input) smoothly because of the help of the regularization from the KL Divergence loss function.
 
 ## 2. Coding Tasks:
 ### **Task 1:**
@@ -36,6 +36,7 @@ classes = ('plane', 'car', 'bird', 'cat',
         'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 ```
 After importing, I analyzed the dataset a bit, the train dataset has 50,000 images and the test dataset has 10,000 images. The shape of the batches being (32, 3, 32, 32). I chose a batch size of 32 while the images have 3 channels and a width and height of 32 pixels. Plotting a random image yields:
+
 <img src="./images/owl.png">
 Changing the VAE to use convolutional layers instead of fully connected layers took quite a bit of fine tuning. I set up the encoder as follows:
 ```python
@@ -79,8 +80,10 @@ for step in np.linspace(0, 1, num_steps):
 ```
 The linspace provides a gradient between the full outputs of both images. With the interpolated z value calculated, the VAE decodes the image and appends the image (without the batch data, just for plotting purposes) to a list.
 I chose 2 random images, plotted them, then calculated their interpolations, and plotted those images:
+
 <img src="./images/img_choices.png">
 <img src="./images/interp_outputs.png">
+
 While blurry, it is easy to distinguish that the left side resembles the shape and color of the original image while the right side resembles the original img 2, with all the other images being interpolated along the gradient. This demonstrates that a VAE can generate vast combinations of data.
 
 ### **Task 3:**
@@ -89,5 +92,6 @@ For no particular reason, I decided to use PIL Image instead of torchvision read
 
 <img src="./images/ffhq_train_images.png">
 The images above are randomly selected and the images generated are random as well, there is no correlation between the rows of images above and below this text. This is just meant to show a sample of what the training dataset looks like versus the quality of images that are produced.
+
 <img src="./images/latent_space_generation.png">
 I am very impressed with the quality of most of the images. There are clearly defined features in each individual.
