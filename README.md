@@ -59,7 +59,9 @@ h2 = h2.view(h2.size(0), 1600, 4, 4) # in reverse (batch_size(32) * 1600 * 4 * 4
 ```
 to the decoder. The loss function had specified dimensions which I had to remove as the CIFAR10 dataset has different dimensionality than the MNIST dataset. The models and data were sent to the GPU to improve model training times. I then compared the MNIST images that the fully connected VAE produced to the CIFAR10 images that the convolutional model produced:
 
-<img src="./images/fcvae.png"><img src="./images/cvae.png">
+<img src="./images/fcvae.png">\
+<img src="./images/cvae.png">
+
 I found that even though the convolutional VAE is more optimized for handling image data, that the FC VAE running on the much simpler MNIST dataset had an easier time of reproducing images that are more distinguishable to my eyes. Of course, most of this is due to the contrast between the pixels in the MNIST dataset, and some of the time is it difficult to identify what numeral is being outputted by the model. The convolutional VAE always produced blurry images, but I expected this as the CIFAR10 dataset is very pixelated, it is just very difficult to produce color images of complex shapes on this small of a resolution, especially given the 32x32 input dimensions of the dataset. I do believe I can identify some of the outputs in the sequence above, however.
 
 ### **Task 2:**
@@ -84,6 +86,7 @@ While blurry, it is easy to distinguish that the left side resembles the shape a
 ### **Task 3:**
 The dataset of faces really piqued my interest so I pursued a similar dataset to the one mentioned in the assignment. I stumbled upon the [Flickr Faces HQ Dataset](https://github.com/NVlabs/ffhq-dataset) by NVlabs. It is a dataset of 70,000 1024x1024 PNG images that contains a large array of different human faces. The full dataset is 89 GB and I would resize it anyway so I opted to download the 128x128 thumbnail version of the dataset which is a more manageable 1.95 GB. Because there are no classes, it is just images in a folder, I opted to create my own dataset class instead of trying to work around the PyTorch DataFolder class. As stated in the [PyTorch docs](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html#creating-a-custom-dataset-for-your-files), a custom dataset needs to implement the init, len, and getitem functions so I did that in a similar way to the tutorial. Because the dataset contains larger images I opted to add one more convolutional layer. Other than that, the model is the same as the convolutional VAE written in Task 1.
 For no particular reason, I decided to use PIL Image instead of torchvision read_image, which was used in the PyTorch tutorial. I also defined a train and test split out of habit which is not necessary here, so the actual size of the training dataset is 56,000 images. Due to the long training time I opted to call the 56,000 images sufficient. **Assignment_3_fixes.ipynb** corrects this issue.
+
 <img src="./images/ffhq_train_images.png">
 The images above are randomly selected and the images generated are random as well, there is no correlation between the rows of images above and below this text. This is just meant to show a sample of what the training dataset looks like versus the quality of images that are produced.
 <img src="./images/latent_space_generation.png">
