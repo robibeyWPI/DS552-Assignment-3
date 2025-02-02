@@ -38,7 +38,9 @@ classes = ('plane', 'car', 'bird', 'cat',
 After importing, I analyzed the dataset a bit, the train dataset has 50,000 images and the test dataset has 10,000 images. The shape of the batches being (32, 3, 32, 32). I chose a batch size of 32 while the images have 3 channels and a width and height of 32 pixels. Plotting a random image yields:
 
 <img src="./images/owl.png">
+
 Changing the VAE to use convolutional layers instead of fully connected layers took quite a bit of fine tuning. I set up the encoder as follows:
+
 ```python
     self.encoder = nn.Sequential(
         nn.Conv2d(input_dim, hidden_dim, kernel_size=4, stride=2, padding=1), # (batch, 3, 32, 32) -> (400, 16, 16)
@@ -49,6 +51,7 @@ Changing the VAE to use convolutional layers instead of fully connected layers t
         nn.ReLU()
     )
 ```
+
 I halved the width and the height with each layer, from 32x32 all the way down to 4x4 while expanding the number of the hidden_dim with the same factor, from 400 hidden dimensions up to 1600. $\mu$ and $\sigma$ are fully connected layers with the flattened size and ending with the latent dimension size. In this case, squeezing the highly dimensional 1600 hidden_dim into the 20-dimensional latent_dim. The decoder is the same exact thing but in reverse, expanding the latent_dim back into the hidden_dim and using convolutional layers to get back to the original input dimensions. I had to also edit the encode and decode section as I now included the ReLU layers inside the encoder and the sigmoid at the end of the decoder. I also had to add
 ```python
 # h1.size(0) is the batch, remains unchanged
